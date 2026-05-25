@@ -41,8 +41,16 @@ async function loadLayout() {
     if (r.ok) { const d = await r.json(); if (Array.isArray(d.panes) && d.panes.length) LAYOUT = { panes: d.panes } }
   } catch { /* default */ }
 }
+const LS_KEY = 'split.layout.v1'
+function loadLocal() {
+  try {
+    const d = JSON.parse(localStorage.getItem(LS_KEY) || 'null')
+    if (d && Array.isArray(d.panes) && d.panes.length) LAYOUT = { panes: d.panes }
+  } catch { /* none / private mode */ }
+}
 async function saveLayout() {
-  if (!loggedIn()) return
+  try { localStorage.setItem(LS_KEY, JSON.stringify(LAYOUT)) } catch { /* private mode */ }
+  if (!loggedIn()) return  // pod sync below is signed-in only; localStorage already kept it
   const put = () => authFetch(LAYOUT_URL, { method: 'PUT', headers: { 'Content-Type': 'application/ld+json' }, body: JSON.stringify(LAYOUT) })
   let r = await put()
   if (!r.ok && (r.status === 404 || r.status === 409)) {
@@ -121,7 +129,8 @@ document.getElementById('addPane').addEventListener('click', () => {
 async function init() {
   APP_NAMES = await loadApps()
   appListEl.innerHTML = APP_NAMES.map((n) => `<option value="${esc(n)}">`).join('')
-  if (loggedIn()) await loadLayout()
+  loadLocal()
+  if (loggedIn()) await loadLayout()  // pod copy (synced across devices) overrides the local cache
   render()
 }
 init()
