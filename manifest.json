@@ -1,0 +1,13 @@
+{
+  "name": "split — your Solid pod",
+  "short_name": "split",
+  "description": "Embed your pod apps (or any URL) side by side in resizable panes.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0e0f13",
+  "theme_color": "#2a3140",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
